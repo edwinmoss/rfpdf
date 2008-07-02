@@ -51,7 +51,7 @@ module RFPDF
 		  unless @action_view.controller.headers["Content-Type"] == 'application/pdf'
 			  @generate = true
 				@action_view.controller.headers["Content-Type"] = 'application/pdf'
-				@action_view.controller.headers["Content-disposition:"] = "inline; filename=\"#{@options[:file_name]}\""
+				@action_view.controller.headers["Content-disposition"] = "inline; filename=\"#{@options[:file_name]}\""
 			end
       assigns = @action_view.assigns.dup
     
@@ -66,10 +66,17 @@ module RFPDF
 			  local_assigns.each do |key,val|
 		  		class << self; self; end.send(:define_method,key){ val }
 				end
-        ERB.new(template).result(binding)
+        ERB.new(template.source).result(binding)
       end
     end
 
+    def self.compilable? 
+      false 
+    end 
+
+    def compilable? 
+      self.class.compilable? 
+    end
   end
   
 end

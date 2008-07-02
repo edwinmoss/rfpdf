@@ -16,4 +16,4 @@ require "#{File.dirname __FILE__}/lib/fpdf/chinese"
 require "#{File.dirname __FILE__}/lib/fpdf/japanese"
 require "#{File.dirname __FILE__}/lib/fpdf/korean"
 
-ActionView::Base::register_template_handler 'rfpdf', RFPDF::View
+ActionView::Template::register_template_handler 'rfpdf', RFPDF::View
