@@ -2848,7 +2848,7 @@ class TCPDF
 	#
 	def escape(s)
     # Add \ before \, ( and )
-    s.gsub('\\','\\\\').gsub('(','\\(').gsub(')','\\)')
+    s.gsub('\\','\\\\\\').gsub('(','\\(').gsub(')','\\)').gsub(13.chr, '\r')
 	end
 
 	#
