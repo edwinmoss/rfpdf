@@ -8,6 +8,8 @@ require('cgi')
 require "#{File.dirname __FILE__}/lib/core/view"
 require "#{File.dirname __FILE__}/lib/core/rfpdf"
 
+require "#{File.dirname __FILE__}/lib/math"
+
 require "#{File.dirname __FILE__}/lib/tcpdf"
 
 require "#{File.dirname __FILE__}/lib/fpdf/errors"
