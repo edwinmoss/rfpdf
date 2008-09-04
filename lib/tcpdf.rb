@@ -84,6 +84,7 @@ end
 #
 class TCPDF
   include RFPDF
+  include TCPPDFMath
   
   cattr_accessor :k_cell_height_ratio
   @@k_cell_height_ratio = 1.25
@@ -811,6 +812,74 @@ class TCPDF
 	end
 	  alias_method :add_page, :AddPage
 	
+  #
+  # Rotate object.
+  # @param float :angle angle in degrees for counter-clockwise rotation
+  # @param int :x abscissa of the rotation center. Default is current x position
+  # @param int :y ordinate of the rotation center. Default is current y position
+  #
+  def Rotate(angle, x="", y="")
+
+  	if (x == '')
+  		x = @x;
+  	end
+  	
+  	if (y == '')
+  		y = @y;
+  	end
+  	
+  	if (@rtl)
+  		x = @w - x;
+  		angle = -@angle;
+  	end
+  	
+  	y = (@h - y) * @k;
+  	x *= @k;
+
+  	# calculate elements of transformation matrix
+  	tm = []
+  	tm[0] = Math::cos(deg2rad(angle));
+  	tm[1] = Math::sin(deg2rad(angle));
+  	tm[2] = -tm[1];
+  	tm[3] = tm[0];
+  	tm[4] = x + tm[1] * y - tm[0] * x;
+  	tm[5] = y - tm[0] * y - tm[1] * x;
+
+  	# generate the transformation matrix
+  	Transform(tm);
+  end
+    alias_method :rotate, :Rotate
+  
+  #
+	# Starts a 2D tranformation saving current graphic state.
+	# This function must be called before scaling, mirroring, translation, rotation and skewing.
+	# Use StartTransform() before, and StopTransform() after the transformations to restore the normal behavior.
+	#
+	def StartTransform
+		out('q');
+	end
+	  alias_method :start_transform, :StartTransform
+	
+	#
+	# Stops a 2D tranformation restoring previous graphic state.
+	# This function must be called after scaling, mirroring, translation, rotation and skewing.
+	# Use StartTransform() before, and StopTransform() after the transformations to restore the normal behavior.
+	#
+	def StopTransform
+		out('Q');
+	end
+	  alias_method :stop_transform, :StopTransform
+	
+  #
+	# Apply graphic transformations.
+	# @since 2.1.000 (2008-01-07)
+	# @see StartTransform(), StopTransform()
+	#
+	def Transform(tm)
+		x = out(sprintf('%.3f %.3f %.3f %.3f %.3f %.3f cm', tm[0], tm[1], tm[2], tm[3], tm[4], tm[5]));
+	end
+	  alias_method :transform, :Transform
+		
 	#
  	# Set header data.
 	# @param string :ln header image logo
@@ -3734,7 +3803,7 @@ class TCPDF
   	  @@decoder.decode(string)
     end
   end
-	
+  
 end # END OF CLASS
 
 #TODO 2007-05-25 (EJM) Level=0 - 
