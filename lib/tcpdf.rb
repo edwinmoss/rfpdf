@@ -2769,11 +2769,11 @@ class TCPDF
 	# @access protected
 	#
 	def parsejpg(file)
-		a=GetImageSize(file);
+		a=getimagesize(file);
 		if (a.empty?)
 			Error('Missing or incorrect image file: ' + file);
 		end
-		if (a[2]!=2)
+		if (a[2]!='JPEG')
 			Error('Not a JPEG file: ' + file);
 		end
 		if (a['channels'].nil? or a['channels']==3)
@@ -2789,7 +2789,6 @@ class TCPDF
 	  open(file,'rb') do |f|
 			data<<f.read();
 		end
-		f.close
 		return {'w' => a[0],'h' => a[1],'cs' => colspace,'bpc' => bpc,'f'=>'DCTDecode','data' => data}
 	end
 
