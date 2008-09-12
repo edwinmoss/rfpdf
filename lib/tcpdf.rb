@@ -1644,7 +1644,7 @@ class TCPDF
 	# @since 1.0
 	# @see SetFont(), SetDrawColor(), SetFillColor(), SetTextColor(), SetLineWidth(), AddLink(), Ln(), MultiCell(), Write(), SetAutoPageBreak()
 	#
-	def Cell(w, h=0, txt='', border=0, ln=0, align='', fill=0, link='')
+	def Cell(w, h=0, txt='', border=0, ln=0, align='', fill=0, link=nil)
 		#Output a cell
 		k=@k;
 		if ((@y + h) > @page_break_trigger and !@in_footer and AcceptPageBreak())
@@ -1892,7 +1892,7 @@ class TCPDF
 	# @since 1.5
 	# @see SetFont(), SetTextColor(), AddLink(), MultiCell(), SetAutoPageBreak()
 	#
-	def Write(h, txt, link='', fill=0)
+	def Write(h, txt, link=nil, fill=0)
 
 		#Output text in flowing mode
 		w = @w - @r_margin - @x;
@@ -1995,7 +1995,7 @@ class TCPDF
 	# @since 1.1
 	# @see AddLink()
 	#
-	def Image(file, x, y, w=0, h=0, type='', link='')
+	def Image(file, x, y, w=0, h=0, type='', link=nil)
 		#Put an image on the page
 		if (@images[file].nil?)
 			#First use of image, get info
