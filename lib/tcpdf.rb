@@ -1111,6 +1111,18 @@ class TCPDF
 	end
   alias_method :set_text_color, :SetTextColor
 
+  # This hasn't been ported from tcpdf, it's a variation on SetTextColor for setting cmyk colors
+	def SetCmykTextColor(c, m, y, k, storeprev=false)
+		#Set color for text
+		@text_color=sprintf('%.3f %.3f %.3f %.3f k', c, m, y, k);
+		@color_flag=(@fill_color!=@text_color);
+		if (storeprev)
+			# store color as previous value
+			@prevtext_color = [c, m, y, k]
+		end
+	end
+  alias_method :set_cmyk_text_color, :SetCmykTextColor
+  
 	#
 	# Returns the length of a string in user unit. A font must be selected.<br>
 	# Support UTF-8 Unicode [Nicola Asuni, 2005-01-02]
