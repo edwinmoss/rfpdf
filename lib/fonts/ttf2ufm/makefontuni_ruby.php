@@ -83,7 +83,7 @@ function MakeFontDescriptor($fm)
 {
   //Ascent
   $asc=(isset($fm['Ascender']) ? $fm['Ascender'] : 1000);
-  $fd="array('Ascent'=>".$asc;
+  $fd="{'Ascent'=>".$asc;
   //Descent
   $desc=(isset($fm['Descender']) ? $fm['Descender'] : -200);
   $fd.=",'Descent'=>".$desc;
@@ -123,14 +123,14 @@ function MakeFontDescriptor($fm)
   //MissingWidth
   if(isset($fm['MissingWidth']))
     $fd.=",'MissingWidth'=>".$fm['MissingWidth'];
-  $fd.=')';
+  $fd.='}';
   return $fd;
 }
 
 function MakeWidthArray($fm)
 {
   //Make character width array
-  $s="array(";
+  $s="{";
   $cw=$fm['Widths'];
   $els=array();
   $c=0;
@@ -139,7 +139,7 @@ function MakeWidthArray($fm)
     $els[] = ((($c++)%16==0)?"\n\t":'').$i.'=>'.$w;
   }
   $s .= implode(', ', $els);
-  $s.=')';
+  $s.='}';
   return $s;
 }
 
@@ -232,21 +232,20 @@ function MakeFont($fontfile,$ufmfile)
       die('<B>Error:</B> incorrect font type: '.$type);
   }
   //Start generation
-  $s='<?php'."\n";
-  $s.='$type=\''.$type."';\n";
-  $s.='$name=\''.$fm['FontName']."';\n";
-  $s.='$desc='.$fd.";\n";
+  $basename=strtolower(substr(basename($ufmfile),0,-4));
+  $s='TCPDFFontDescriptor.define(\''.$basename."') do |font|\n";
+  $s.="  font[:type]='".$type."'\n";
+  $s.="  font[:name]='".$fm['FontName']."'\n";
+  $s.="  font[:desc]=".$fd."\n";
   if(!isset($fm['UnderlinePosition']))
     $fm['UnderlinePosition']=-100;
   if(!isset($fm['UnderlineThickness']))
     $fm['UnderlineThickness']=50;
-  $s.='$up='.$fm['UnderlinePosition'].";\n";
-  $s.='$ut='.$fm['UnderlineThickness'].";\n";
-  $w=MakeWidthArray($fm);
-  $s.='$cw='.$w.";\n";
-  $s.="\$enc='';\n";
-  $s.="\$diff='';\n";
-  $basename=substr(basename($ufmfile),0,-4);
+  $s.="  font[:up]=".$fm['UnderlinePosition']."\n";
+  $s.="  font[:ut]=".$fm['UnderlineThickness']."\n";
+  $s.="  font[:cw]=".MakeWidthArray($fm)."\n";
+  $s.="  font[:enc]=''\n";
+  $s.="  font[:diff]=''\n";
   if($fontfile)
   {
     //Embedded font
@@ -262,17 +261,17 @@ function MakeFont($fontfile,$ufmfile)
     {
       $cmp=$basename.'.z';
       SaveToFile($cmp,gzcompress($file),'b');
-      $s.='$file=\''.$cmp."';\n";
+      $s.='  font[:file]=\''.$cmp."'\n";
       echo 'Font file compressed ('.$cmp.')<BR>';
 
       $cmp=$basename.'.ctg.z';
       SaveToFile($cmp,gzcompress($cidtogidmap),'b');
       echo 'CIDToGIDMap created and compressed ('.$cmp.')<BR>';     
-      $s.='$ctg=\''.$cmp."';\n";
+      $s.='  font[:ctg]=\''.$cmp."'\n";
     }
     else
     {
-      $s.='$file=\''.basename($fontfile)."';\n";
+      $s.='$file=\''.basename($fontfile)."'\n";
       echo '<B>Notice:</B> font file could not be compressed (gzcompress not available)<BR>';
       
       $cmp=$basename.'.ctg';
@@ -280,24 +279,24 @@ function MakeFont($fontfile,$ufmfile)
       fwrite($f, $cidtogidmap);
       fclose($f);
       echo 'CIDToGIDMap created ('.$cmp.')<BR>';
-      $s.='$ctg=\''.$cmp."';\n";
+      $s.='  font[:ctg]=\''.$cmp."'\n";
     }
     if($type=='Type1')
     {
-      $s.='$size1='.$size1.";\n";
-      $s.='$size2='.$size2.";\n";
+      $s.='  font[:size1]='.$size1."\n";
+      $s.='  font[:size2]='.$size2."\n";
     }
     else
-      $s.='$originalsize='.filesize($fontfile).";\n";
+      $s.='  font[:originalsize]='.filesize($fontfile)."\n";
   }
   else
   {
     //Not embedded font
-    $s.='$file='."'';\n";
+    $s.='  font[:file]='."''\n";
   }
-  $s.="?>\n";
-  SaveToFile($basename.'.php',$s);
-  echo 'Font definition file generated ('.$basename.'.php'.')<BR>';
+  $s.="end\n";
+  SaveToFile($basename.'.rb',$s);
+  echo 'Font definition file generated ('.$basename.'.rb'.')<BR>';
 }
 
 $arg = $GLOBALS['argv'];
@@ -309,6 +308,6 @@ if (count($arg) >= 3) {
   print preg_replace('!<BR( /)?>!i', "\n", $t);
 }
 else {
-  print "Usage: makefontuni.php <ttf-file> <ufm-file>\n";
+  print "Usage: makefontuni_ruby.php <ttf-file> <ufm-file>\n";
 }
 ?>

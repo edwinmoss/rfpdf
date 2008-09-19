@@ -11,15 +11,20 @@ for usage with makefontuni.php or makefontuni.rb.
 
 Setting up a Truetype font for usage with UFPDF:
   1) Generate the font's .ufm metrics file by processing it with the provided 
-     ttf2ufm program (modified ttf2pt1). For example:
-     $ ttf2ufm -a -F myfont.ttf
-  2a) Run makefontuni.php with the .ttf and .ufm filenames as argument:
-     $ php -q makefontuni.php myfont.ttf myfont.ufm
-  2b) or run makefontuni.rb with the .ttf and .ufm filenames as argument:
-    $ php -q makefontuni.rb myfont.ttf myfont.ufm
+      ttf2ufm program (modified ttf2pt1). For example:
+      $ ttf2ufm -a -F myfont.ttf
+  
+  2) Run makefontuni_ruby.php with the .ttf and .ufm filenames as argument:
+      $ php -q makefontuni_ruby.php myfont.ttf myfont.ufm
+  
   3) Copy the resulting .rb, .z and .ctg.z file to the TCPDF font directory.
+  
   4) Rename php font files variations for bold and italic using the following schema:
-  	[basic-font-name]b.rb for bold variation
-  	[basic-font-name]i.rb for oblique variation
-  	[basic-font-name]bi.rb for bold oblique variation
+    	[basic-font-name]b.rb for bold variation
+    	[basic-font-name]i.rb for oblique variation
+    	[basic-font-name]bi.rb for bold oblique variation
   	
+  5) Rename the name of the font in the first line of each .rb file:
+      TCPDFFontDescriptor.define('dtlargotitalic') do |font|
+     becomes:
+      TCPDFFontDescriptor.define('dtlargoti') do |font|
