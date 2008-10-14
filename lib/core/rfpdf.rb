@@ -182,29 +182,29 @@ module RFPDF
     SetFont(options[:font], options[:font_style], font_size)
   	font_size += options[:font_line_spacing]
   	case options[:valign]
-  	  when "B"
+  	  when "B", "bottom"
   	    y -= options[:padding]
-  	  when "T"
+  	  when "T", "top"
   	    y += options[:padding]
   	end
   	case options[:align]
-  	  when "L"
+  	  when "L", "left"
   	    x += options[:x_padding]
   	    w -= options[:x_padding]
   	    w -= options[:x_padding]
-  	  when "R"
+  	  when "R", "right"
   	    x += options[:x_padding]
   	    w -= options[:x_padding]
   	    w -= options[:x_padding]
   	end
     SetXY(x, y)
-    if GetStringWidth(text) < w or not text["\n"].nil? and options[:valign] == "T"
+    if GetStringWidth(text) < w or not text["\n"].nil? and (options[:valign] == "T" || options[:valign] == "top")
       text = text + "\n"
     end
-    if GetStringWidth(text) > w or not text["\n"].nil? or options[:valign] == "B"
+    if GetStringWidth(text) > w or not text["\n"].nil? or (options[:valign] == "B" || options[:valign] == "bottom")
       font_size += options[:font_size] * 0.1
       # TODO 2006-07-21 Level=1 - this is assuming a 2 line text
-      SetXY(x, y + ((h - (font_size * 2)) / 2)) if options[:valign] == "M"
+      SetXY(x, y + ((h - (font_size * 2)) / 2)) if (options[:valign] == "M" || options[:valign] == "middle")
       MultiCell(w, font_size, text, 0, options[:align])
     else
       Cell(w, h, text, 0, 0, options[:align])

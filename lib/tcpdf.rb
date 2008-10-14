@@ -1704,9 +1704,9 @@ class TCPDF
 		end
 		if (txt != '')
 			width = GetStringWidth(txt);
-			if (align == 'R')
+			if (align == 'R' || align == 'right')
 				dx = w - @c_margin - width;
-			elsif (align=='C')
+			elsif (align=='C' || align == 'center')
 				dx = (w - width)/2;
 			else
 				dx = @c_margin;
