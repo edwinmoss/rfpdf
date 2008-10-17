@@ -12,6 +12,7 @@ module RFPDF
   # * <tt>:border_width</tt> - Default value is <tt>0.5</tt>.
   # * <tt>:fill</tt> - Fill the box, 0 = no, 1 = yes? Default value is <tt>1</tt>.
   # * <tt>:fill_color</tt> - Default value is nothing or <tt>COLOR_PALETTE[:white]</tt>.
+  # * <tt>:fill_colorspace</tt> - Default value is :rgb or <tt>''</tt>.
   #
   # Example:
   #
@@ -23,9 +24,10 @@ module RFPDF
     options[:border_width] ||= 0.5
     options[:fill] ||= 1
     options[:fill_color] ||= RFPDF::COLOR_PALETTE[:white]
+    options[:fill_colorspace] ||= :rgb
     SetLineWidth(options[:border_width])
     set_draw_color_a(options[:border_color])
-    set_fill_color_a(options[:fill_color])
+    set_fill_color_a(options[:fill_color], :options[:colorspace])
     fd = ""
     fd = "D" if options[:border] == 1
     fd += "F" if options[:fill] == 1
@@ -111,6 +113,7 @@ module RFPDF
   # * <tt>:border_width</tt> - Default value is <tt>0.5</tt>.
   # * <tt>:fill</tt> - Fill the box, 0 = no, 1 = yes? Default value is <tt>1</tt>.
   # * <tt>:fill_color</tt> - Default value is nothing or <tt>COLOR_PALETTE[:white]</tt>.
+  # * <tt>:fill_colorspace</tt> - Default value is :rgb or <tt>''</tt>.
   #
   # Example:
   #
@@ -122,9 +125,10 @@ module RFPDF
     options[:border_width] ||= 0.5
     options[:fill] ||= 1
     options[:fill_color] ||= RFPDF::COLOR_PALETTE[:white]
+    options[:fill_colorspace] ||= :rgb
     SetLineWidth(options[:border_width])
     set_draw_color_a(options[:border_color])
-    set_fill_color_a(options[:fill_color])
+    set_fill_color_a(options[:fill_color], options[:fill_colorspace])
     fd = ""
     fd = "D" if options[:border] == 1
     fd += "F" if options[:fill] == 1
@@ -252,8 +256,12 @@ module RFPDF
   #
 	#   set_fill_color_a(ReportHelper::COLOR_PALETTE[:dark_blue])
 	#
-  def set_fill_color_a(color = RFPDF::COLOR_PALETTE[:white])
-    SetFillColor(color[0], color[1], color[2])
+  def set_fill_color_a(color = RFPDF::COLOR_PALETTE[:white], colorspace = :rgb)
+    if colorspace == :cmyk
+      SetCmykFillColor(color[0], color[1], color[2], color[3])
+    else
+      SetFillColor(color[0], color[1], color[2])
+    end
   end
 
   # Set the text color. Default value is <tt>COLOR_PALETTE[:white]</tt>.

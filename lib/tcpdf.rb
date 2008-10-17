@@ -1087,6 +1087,21 @@ class TCPDF
 	end
   alias_method :set_fill_color, :SetFillColor
 
+  # This hasn't been ported from tcpdf, it's a variation on SetTextColor for setting cmyk colors
+	def SetCmykFillColor(c, m, y, k, storeprev=false)
+		#Set color for all filling operations
+		@fill_color=sprintf('%.3f %.3f %.3f %.3f k', c, m, y, k);
+		@color_flag=(@fill_color!=@text_color);
+		if (storeprev)
+			# store color as previous value
+			@prevtext_color = [c, m, y, k]
+		end
+		if (@page>0)
+			out(@fill_color);
+		end
+	end
+  alias_method :set_cmyk_fill_color, :SetCmykFillColor
+
 	#
 	# Defines the color used for text. It can be expressed in RGB components or gray scale. The method can be called before the first page is created and the value is retained from page to page.
 	# @param int :r If g et b are given, red component; if not, indicates the gray level. Value between 0 and 255
