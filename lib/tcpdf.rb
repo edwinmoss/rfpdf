@@ -1855,7 +1855,7 @@ class TCPDF
 					end
           Cell(w, h, s[from_j..to_index-1], b, 2, align, fill) # my FPDF version
 				else
-					if (align=='J')
+					if (align=='J' || align=='justify' || align=='justified')
 						@ws = (ns>1) ? (wmax-ls)/(ns-1) : 0;
 						out(sprintf('%.3f Tw', @ws * @k));
 					end
