@@ -27,3 +27,4 @@ require "#{File.dirname __FILE__}/lib/fpdf/japanese"
 require "#{File.dirname __FILE__}/lib/fpdf/korean"
 
 ActionView::Template::register_template_handler 'rfpdf', RFPDF::View
+Mime::Type.register "application/pdf", :pdf
