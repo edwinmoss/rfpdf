@@ -29,7 +29,7 @@
 
 module RFPDF
   
-  class View
+  class View < ActionView::TemplateHandler
     
     def initialize(action_view)
       @action_view = action_view
