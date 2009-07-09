@@ -12,6 +12,7 @@ module RFPDF
   # * <tt>:border_width</tt> - Default value is <tt>0.5</tt>.
   # * <tt>:fill</tt> - Fill the box, 0 = no, 1 = yes? Default value is <tt>1</tt>.
   # * <tt>:fill_color</tt> - Default value is nothing or <tt>COLOR_PALETTE[:white]</tt>.
+  # * <tt>:fill_colorspace</tt> - Default value is :rgb or <tt>''</tt>.
   #
   # Example:
   #
@@ -23,9 +24,10 @@ module RFPDF
     options[:border_width] ||= 0.5
     options[:fill] ||= 1
     options[:fill_color] ||= RFPDF::COLOR_PALETTE[:white]
+    options[:fill_colorspace] ||= :rgb
     SetLineWidth(options[:border_width])
     set_draw_color_a(options[:border_color])
-    set_fill_color_a(options[:fill_color])
+    set_fill_color_a(options[:fill_color], :options[:colorspace])
     fd = ""
     fd = "D" if options[:border] == 1
     fd += "F" if options[:fill] == 1
@@ -56,6 +58,7 @@ module RFPDF
   # * <tt>:font_color</tt> - Default value is <tt>COLOR_PALETTE[:black]</tt>.
   # * <tt>:font_size</tt> - Default value is <tt>10</tt>.
   # * <tt>:font_style</tt> - Default value is nothing or <tt>''</tt>.
+  # * <tt>:colorspace</tt> - Default value is :rgb or <tt>''</tt>.
   #
   # Example:
   #
@@ -66,7 +69,7 @@ module RFPDF
     options[:font] ||= default_font
     options[:font_size] ||= 10
     options[:font_style] ||= ''
-    set_text_color_a(options[:font_color])
+    set_text_color_a(options[:font_color], options[:colorspace])
     SetFont(options[:font], options[:font_style], options[:font_size])
     SetXY(x, y)
     Write(options[:font_size] + 4, text)
@@ -79,6 +82,7 @@ module RFPDF
   # * <tt>:font_color</tt> - Default value is <tt>COLOR_PALETTE[:black]</tt>.
   # * <tt>:font_size</tt> - Default value is <tt>10</tt>.
   # * <tt>:font_style</tt> - Default value is nothing or <tt>''</tt>.
+  # * <tt>:colorspace</tt> - Default value is :rgb or <tt>''</tt>.
   #
   # Example:
   #
@@ -92,7 +96,7 @@ module RFPDF
     options[:font_color] ||= RFPDF::COLOR_PALETTE[:black]
     options[:font_size] ||= 10
     options[:font_style] ||= ''
-    set_text_color_a(options[:font_color])
+    set_text_color_a(options[:font_color], options[:colorspace])
     SetFont(options[:font], options[:font_style], options[:font_size])
     SetXY(x, y)
     SetLeftMargin(left_margin)
@@ -109,6 +113,7 @@ module RFPDF
   # * <tt>:border_width</tt> - Default value is <tt>0.5</tt>.
   # * <tt>:fill</tt> - Fill the box, 0 = no, 1 = yes? Default value is <tt>1</tt>.
   # * <tt>:fill_color</tt> - Default value is nothing or <tt>COLOR_PALETTE[:white]</tt>.
+  # * <tt>:fill_colorspace</tt> - Default value is :rgb or <tt>''</tt>.
   #
   # Example:
   #
@@ -120,9 +125,10 @@ module RFPDF
     options[:border_width] ||= 0.5
     options[:fill] ||= 1
     options[:fill_color] ||= RFPDF::COLOR_PALETTE[:white]
+    options[:fill_colorspace] ||= :rgb
     SetLineWidth(options[:border_width])
     set_draw_color_a(options[:border_color])
-    set_fill_color_a(options[:fill_color])
+    set_fill_color_a(options[:fill_color], options[:fill_colorspace])
     fd = ""
     fd = "D" if options[:border] == 1
     fd += "F" if options[:fill] == 1
@@ -144,6 +150,7 @@ module RFPDF
   # * <tt>:padding</tt> - Default value is nothing or <tt>2</tt>.
   # * <tt>:x_padding</tt> - Default value is nothing.
   # * <tt>:valign</tt> - 'M' = middle, 'T' = top, 'B' = bottom. Default value is nothing or <tt>'M'</tt>.
+  # * <tt>:colorspace</tt> - Default value is :rgb or <tt>''</tt>.
   #
   # Example:
   #
@@ -174,34 +181,34 @@ module RFPDF
       draw_box(x, y, w, h, options)
   	end    
     SetMargins(0,0,0)
-    set_text_color_a(options[:font_color])
+    set_text_color_a(options[:font_color], options[:colorspace])
   	font_size = options[:font_size]
     SetFont(options[:font], options[:font_style], font_size)
   	font_size += options[:font_line_spacing]
   	case options[:valign]
-  	  when "B"
+  	  when "B", "bottom"
   	    y -= options[:padding]
-  	  when "T"
+  	  when "T", "top"
   	    y += options[:padding]
   	end
   	case options[:align]
-  	  when "L"
+  	  when "L", "left"
   	    x += options[:x_padding]
   	    w -= options[:x_padding]
   	    w -= options[:x_padding]
-  	  when "R"
+  	  when "R", "right"
   	    x += options[:x_padding]
   	    w -= options[:x_padding]
   	    w -= options[:x_padding]
   	end
     SetXY(x, y)
-    if GetStringWidth(text) < w or not text["\n"].nil? and options[:valign] == "T"
+    if GetStringWidth(text) < w or not text["\n"].nil? and (options[:valign] == "T" || options[:valign] == "top")
       text = text + "\n"
     end
-    if GetStringWidth(text) > w or not text["\n"].nil? or options[:valign] == "B"
+    if GetStringWidth(text) > w or not text["\n"].nil? or (options[:valign] == "B" || options[:valign] == "bottom")
       font_size += options[:font_size] * 0.1
       # TODO 2006-07-21 Level=1 - this is assuming a 2 line text
-      SetXY(x, y + ((h - (font_size * 2)) / 2)) if options[:valign] == "M"
+      SetXY(x, y + ((h - (font_size * 2)) / 2)) if (options[:valign] == "M" || options[:valign] == "middle")
       MultiCell(w, font_size, text, 0, options[:align])
     else
       Cell(w, h, text, 0, 0, options[:align])
@@ -214,6 +221,7 @@ module RFPDF
   # * <tt>:font_color</tt> - Default value is <tt>COLOR_PALETTE[:black]</tt>.
   # * <tt>:font_size</tt> - Default value is <tt>18</tt>.
   # * <tt>:font_style</tt> - Default value is nothing or <tt>''</tt>.
+  # * <tt>:colorspace</tt> - Default value is :rgb or <tt>''</tt>.
   #
   # Example:
   #
@@ -226,7 +234,7 @@ module RFPDF
     options[:font] ||= default_font
     options[:font_size] ||= 18
     options[:font_style] ||= ''
-    set_text_color_a(options[:font_color])
+    set_text_color_a(options[:font_color], options[:colorspace])
     SetFont(options[:font], options[:font_style], options[:font_size])
   	SetXY(x, y)
   	Write(options[:font_size] + 2, title)
@@ -248,8 +256,12 @@ module RFPDF
   #
 	#   set_fill_color_a(ReportHelper::COLOR_PALETTE[:dark_blue])
 	#
-  def set_fill_color_a(color = RFPDF::COLOR_PALETTE[:white])
-    SetFillColor(color[0], color[1], color[2])
+  def set_fill_color_a(color = RFPDF::COLOR_PALETTE[:white], colorspace = :rgb)
+    if colorspace == :cmyk
+      SetCmykFillColor(color[0], color[1], color[2], color[3])
+    else
+      SetFillColor(color[0], color[1], color[2])
+    end
   end
 
   # Set the text color. Default value is <tt>COLOR_PALETTE[:white]</tt>.
@@ -258,8 +270,12 @@ module RFPDF
   #
 	#   set_text_color_a(ReportHelper::COLOR_PALETTE[:dark_blue])
 	#
-  def set_text_color_a(color = RFPDF::COLOR_PALETTE[:black])
-    SetTextColor(color[0], color[1], color[2])
+  def set_text_color_a(color = RFPDF::COLOR_PALETTE[:black], colorspace = :rgb)
+    if colorspace == :cmyk
+      SetCmykTextColor(color[0], color[1], color[2], color[3])
+    else
+      SetTextColor(color[0], color[1], color[2])
+    end
   end
     
   # Write a string containing html characters. Default value is <tt>COLOR_PALETTE[:white]</tt>.

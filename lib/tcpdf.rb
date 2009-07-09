@@ -84,6 +84,7 @@ end
 #
 class TCPDF
   include RFPDF
+  include TCPPDFMath
   
   cattr_accessor :k_cell_height_ratio
   @@k_cell_height_ratio = 1.25
@@ -811,6 +812,74 @@ class TCPDF
 	end
 	  alias_method :add_page, :AddPage
 	
+  #
+  # Rotate object.
+  # @param float :angle angle in degrees for counter-clockwise rotation
+  # @param int :x abscissa of the rotation center. Default is current x position
+  # @param int :y ordinate of the rotation center. Default is current y position
+  #
+  def Rotate(angle, x="", y="")
+
+  	if (x == '')
+  		x = @x;
+  	end
+  	
+  	if (y == '')
+  		y = @y;
+  	end
+  	
+  	if (@rtl)
+  		x = @w - x;
+  		angle = -@angle;
+  	end
+  	
+  	y = (@h - y) * @k;
+  	x *= @k;
+
+  	# calculate elements of transformation matrix
+  	tm = []
+  	tm[0] = Math::cos(deg2rad(angle));
+  	tm[1] = Math::sin(deg2rad(angle));
+  	tm[2] = -tm[1];
+  	tm[3] = tm[0];
+  	tm[4] = x + tm[1] * y - tm[0] * x;
+  	tm[5] = y - tm[0] * y - tm[1] * x;
+
+  	# generate the transformation matrix
+  	Transform(tm);
+  end
+    alias_method :rotate, :Rotate
+  
+  #
+	# Starts a 2D tranformation saving current graphic state.
+	# This function must be called before scaling, mirroring, translation, rotation and skewing.
+	# Use StartTransform() before, and StopTransform() after the transformations to restore the normal behavior.
+	#
+	def StartTransform
+		out('q');
+	end
+	  alias_method :start_transform, :StartTransform
+	
+	#
+	# Stops a 2D tranformation restoring previous graphic state.
+	# This function must be called after scaling, mirroring, translation, rotation and skewing.
+	# Use StartTransform() before, and StopTransform() after the transformations to restore the normal behavior.
+	#
+	def StopTransform
+		out('Q');
+	end
+	  alias_method :stop_transform, :StopTransform
+	
+  #
+	# Apply graphic transformations.
+	# @since 2.1.000 (2008-01-07)
+	# @see StartTransform(), StopTransform()
+	#
+	def Transform(tm)
+		x = out(sprintf('%.3f %.3f %.3f %.3f %.3f %.3f cm', tm[0], tm[1], tm[2], tm[3], tm[4], tm[5]));
+	end
+	  alias_method :transform, :Transform
+		
 	#
  	# Set header data.
 	# @param string :ln header image logo
@@ -1018,6 +1087,21 @@ class TCPDF
 	end
   alias_method :set_fill_color, :SetFillColor
 
+  # This hasn't been ported from tcpdf, it's a variation on SetTextColor for setting cmyk colors
+	def SetCmykFillColor(c, m, y, k, storeprev=false)
+		#Set color for all filling operations
+		@fill_color=sprintf('%.3f %.3f %.3f %.3f k', c, m, y, k);
+		@color_flag=(@fill_color!=@text_color);
+		if (storeprev)
+			# store color as previous value
+			@prevtext_color = [c, m, y, k]
+		end
+		if (@page>0)
+			out(@fill_color);
+		end
+	end
+  alias_method :set_cmyk_fill_color, :SetCmykFillColor
+
 	#
 	# Defines the color used for text. It can be expressed in RGB components or gray scale. The method can be called before the first page is created and the value is retained from page to page.
 	# @param int :r If g et b are given, red component; if not, indicates the gray level. Value between 0 and 255
@@ -1042,6 +1126,18 @@ class TCPDF
 	end
   alias_method :set_text_color, :SetTextColor
 
+  # This hasn't been ported from tcpdf, it's a variation on SetTextColor for setting cmyk colors
+	def SetCmykTextColor(c, m, y, k, storeprev=false)
+		#Set color for text
+		@text_color=sprintf('%.3f %.3f %.3f %.3f k', c, m, y, k);
+		@color_flag=(@fill_color!=@text_color);
+		if (storeprev)
+			# store color as previous value
+			@prevtext_color = [c, m, y, k]
+		end
+	end
+  alias_method :set_cmyk_text_color, :SetCmykTextColor
+  
 	#
 	# Returns the length of a string in user unit. A font must be selected.<br>
 	# Support UTF-8 Unicode [Nicola Asuni, 2005-01-02]
@@ -1575,7 +1671,7 @@ class TCPDF
 	# @since 1.0
 	# @see SetFont(), SetDrawColor(), SetFillColor(), SetTextColor(), SetLineWidth(), AddLink(), Ln(), MultiCell(), Write(), SetAutoPageBreak()
 	#
-	def Cell(w, h=0, txt='', border=0, ln=0, align='', fill=0, link='')
+	def Cell(w, h=0, txt='', border=0, ln=0, align='', fill=0, link=nil)
 		#Output a cell
 		k=@k;
 		if ((@y + h) > @page_break_trigger and !@in_footer and AcceptPageBreak())
@@ -1623,9 +1719,9 @@ class TCPDF
 		end
 		if (txt != '')
 			width = GetStringWidth(txt);
-			if (align == 'R')
+			if (align == 'R' || align == 'right')
 				dx = w - @c_margin - width;
-			elsif (align=='C')
+			elsif (align=='C' || align == 'center')
 				dx = (w - width)/2;
 			else
 				dx = @c_margin;
@@ -1759,7 +1855,7 @@ class TCPDF
 					end
           Cell(w, h, s[from_j..to_index-1], b, 2, align, fill) # my FPDF version
 				else
-					if (align=='J')
+					if (align=='J' || align=='justify' || align=='justified')
 						@ws = (ns>1) ? (wmax-ls)/(ns-1) : 0;
 						out(sprintf('%.3f Tw', @ws * @k));
 					end
@@ -1823,7 +1919,7 @@ class TCPDF
 	# @since 1.5
 	# @see SetFont(), SetTextColor(), AddLink(), MultiCell(), SetAutoPageBreak()
 	#
-	def Write(h, txt, link='', fill=0)
+	def Write(h, txt, link=nil, fill=0)
 
 		#Output text in flowing mode
 		w = @w - @r_margin - @x;
@@ -1926,7 +2022,7 @@ class TCPDF
 	# @since 1.1
 	# @see AddLink()
 	#
-	def Image(file, x, y, w=0, h=0, type='', link='')
+	def Image(file, x, y, w=0, h=0, type='', link=nil)
 		#Put an image on the page
 		if (@images[file].nil?)
 			#First use of image, get info
@@ -2700,11 +2796,11 @@ class TCPDF
 	# @access protected
 	#
 	def parsejpg(file)
-		a=GetImageSize(file);
+		a=getimagesize(file);
 		if (a.empty?)
 			Error('Missing or incorrect image file: ' + file);
 		end
-		if (a[2]!=2)
+		if (a[2]!='JPEG')
 			Error('Not a JPEG file: ' + file);
 		end
 		if (a['channels'].nil? or a['channels']==3)
@@ -2720,7 +2816,6 @@ class TCPDF
 	  open(file,'rb') do |f|
 			data<<f.read();
 		end
-		f.close
 		return {'w' => a[0],'h' => a[1],'cs' => colspace,'bpc' => bpc,'f'=>'DCTDecode','data' => data}
 	end
 
@@ -3734,7 +3829,7 @@ class TCPDF
   	  @@decoder.decode(string)
     end
   end
-	
+  
 end # END OF CLASS
 
 #TODO 2007-05-25 (EJM) Level=0 - 
