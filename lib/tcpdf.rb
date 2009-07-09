@@ -1641,7 +1641,7 @@ class TCPDF
 			if (@color_flag)
 				s<<' Q';
 			end
-			if (link)
+			if link && !link.empty?
 				Link(@x + dx, @y + 0.5 * h - 0.5 * @font_size, width, @font_size, link);
 			end
 		end
