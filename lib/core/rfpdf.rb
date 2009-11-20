@@ -1,4 +1,4 @@
-module RFPDF
+module Core::RFPDF
   COLOR_PALETTE = {
       :black => [0x00, 0x00, 0x00],
       :white => [0xff, 0xff, 0xff],
@@ -20,14 +20,14 @@ module RFPDF
 	#
   def draw_circle(mid_x, mid_y, radius, options = {})
     options[:border] ||= 1
-    options[:border_color] ||= RFPDF::COLOR_PALETTE[:black]
+    options[:border_color] ||= Core::RFPDF::COLOR_PALETTE[:black]
     options[:border_width] ||= 0.5
     options[:fill] ||= 1
-    options[:fill_color] ||= RFPDF::COLOR_PALETTE[:white]
+    options[:fill_color] ||= Core::RFPDF::COLOR_PALETTE[:white]
     options[:fill_colorspace] ||= :rgb
     SetLineWidth(options[:border_width])
     set_draw_color_a(options[:border_color])
-    set_fill_color_a(options[:fill_color], :options[:colorspace])
+    set_fill_color_a(options[:fill_color], options[:colorspace])
     fd = ""
     fd = "D" if options[:border] == 1
     fd += "F" if options[:fill] == 1
@@ -45,7 +45,7 @@ module RFPDF
 	#   draw_line(x1, y1, x1, y1+h, :line_color => ReportHelper::COLOR_PALETTE[:dark_blue], :line_width => 1)
 	#
   def draw_line(x1, y1, x2, y2, options = {})
-    options[:line_color] ||= RFPDF::COLOR_PALETTE[:black]
+    options[:line_color] ||= Core::RFPDF::COLOR_PALETTE[:black]
     options[:line_width] ||= 0.5
     set_draw_color_a(options[:line_color])
     SetLineWidth(options[:line_width])
@@ -65,7 +65,7 @@ module RFPDF
 	#   draw_text(x, y, header_left, :font_size => 10)
 	#
   def draw_text(x, y, text, options = {})
-    options[:font_color] ||= RFPDF::COLOR_PALETTE[:black]
+    options[:font_color] ||= Core::RFPDF::COLOR_PALETTE[:black]
     options[:font] ||= default_font
     options[:font_size] ||= 10
     options[:font_style] ||= ''
@@ -93,7 +93,7 @@ module RFPDF
 	#
   def draw_text_block(x, y, text, left_margin, right_margin_from_right_edge, options = {})
     options[:font] ||= default_font
-    options[:font_color] ||= RFPDF::COLOR_PALETTE[:black]
+    options[:font_color] ||= Core::RFPDF::COLOR_PALETTE[:black]
     options[:font_size] ||= 10
     options[:font_style] ||= ''
     set_text_color_a(options[:font_color], options[:colorspace])
@@ -121,10 +121,10 @@ module RFPDF
 	#
   def draw_box(x, y, w, h, options = {})
     options[:border] ||= 1
-    options[:border_color] ||= RFPDF::COLOR_PALETTE[:black]
+    options[:border_color] ||= Core::RFPDF::COLOR_PALETTE[:black]
     options[:border_width] ||= 0.5
     options[:fill] ||= 1
-    options[:fill_color] ||= RFPDF::COLOR_PALETTE[:white]
+    options[:fill_color] ||= Core::RFPDF::COLOR_PALETTE[:white]
     options[:fill_colorspace] ||= :rgb
     SetLineWidth(options[:border_width])
     set_draw_color_a(options[:border_color])
@@ -165,12 +165,12 @@ module RFPDF
   def draw_text_box(x, y, w, h, text, options = {})
     options[:align] ||= 'C'
     options[:border] ||= 0
-    options[:border_color] ||= RFPDF::COLOR_PALETTE[:black]
+    options[:border_color] ||= Core::RFPDF::COLOR_PALETTE[:black]
     options[:border_width] ||= 0.5
     options[:fill] ||= 1
-    options[:fill_color] ||= RFPDF::COLOR_PALETTE[:white]
+    options[:fill_color] ||= Core::RFPDF::COLOR_PALETTE[:white]
     options[:font] ||= default_font
-    options[:font_color] ||= RFPDF::COLOR_PALETTE[:black]
+    options[:font_color] ||= Core::RFPDF::COLOR_PALETTE[:black]
     options[:font_size] ||= 8
     options[:font_line_spacing] ||= options[:font_size] * 0.3
     options[:font_style] ||= ''
@@ -230,7 +230,7 @@ module RFPDF
 	#       :font_color => ReportHelper::COLOR_PALETTE[:dark_blue])
 	#
   def draw_title(x, y, title, options = {})
-    options[:font_color] ||= RFPDF::COLOR_PALETTE[:black]
+    options[:font_color] ||= Core::RFPDF::COLOR_PALETTE[:black]
     options[:font] ||= default_font
     options[:font_size] ||= 18
     options[:font_style] ||= ''
@@ -246,7 +246,7 @@ module RFPDF
   #
 	#   set_draw_color_a(ReportHelper::COLOR_PALETTE[:dark_blue])
 	#
-  def set_draw_color_a(color = RFPDF::COLOR_PALETTE[:black])
+  def set_draw_color_a(color = Core::RFPDF::COLOR_PALETTE[:black])
     SetDrawColor(color[0], color[1], color[2])
   end
 
@@ -256,7 +256,7 @@ module RFPDF
   #
 	#   set_fill_color_a(ReportHelper::COLOR_PALETTE[:dark_blue])
 	#
-  def set_fill_color_a(color = RFPDF::COLOR_PALETTE[:white], colorspace = :rgb)
+  def set_fill_color_a(color = Core::RFPDF::COLOR_PALETTE[:white], colorspace = :rgb)
     if colorspace == :cmyk
       SetCmykFillColor(color[0], color[1], color[2], color[3])
     else
@@ -270,7 +270,7 @@ module RFPDF
   #
 	#   set_text_color_a(ReportHelper::COLOR_PALETTE[:dark_blue])
 	#
-  def set_text_color_a(color = RFPDF::COLOR_PALETTE[:black], colorspace = :rgb)
+  def set_text_color_a(color = Core::RFPDF::COLOR_PALETTE[:black], colorspace = :rgb)
     if colorspace == :cmyk
       SetCmykTextColor(color[0], color[1], color[2], color[3])
     else

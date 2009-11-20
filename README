@@ -1,3 +1,5 @@
+FWIW - I am migrating my apps to Prawn and Prawnto
+
 = RFPDF Template Plugin
 
 A template plugin allowing the inclusion of ERB-enabled RFPDF template files.

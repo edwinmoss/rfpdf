@@ -1,9 +1,10 @@
-##
-## Initialize the environment
-##
-require File.dirname(__FILE__) + '/environment'
+begin
+  require('htmlentities') 
+rescue LoadError
+  # This gem is not required - just nice to have.
+end
+require('cgi')
+require 'rfpdf'
 
-##
-## Run the install script, too, just to make sure
-##
-require File.dirname(__FILE__) + '/install'
+Mime::Type.register "application/pdf", :pdf
+ActionView::Template::register_template_handler 'rfpdf', RFPDF::TemplateHandlers::Base

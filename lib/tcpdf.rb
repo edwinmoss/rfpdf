@@ -55,21 +55,6 @@ module TCPDFFontDescriptor
   end
 end
 
-# Not needed in Rails 2.x, see rounding.rb
-# class Float 
-#   # Rounds the float with the specified precision. 
-#   # 
-#   #   x = 1.337 
-#   #   x.round    # => 1 
-#   #   x.round(1) # => 1.3 
-#   #   x.round(2) # => 1.34 
-#   def round_with_precision(precision = nil) 
-#     precision = precision.to_i 
-#     precision > 0 ? (self*(10**precision)).round_without_precision / (10**precision).to_f : round_without_precision 
-#   end 
-#   alias_method_chain :round, :precision
-# end
-#
 # This is a Ruby class for generating PDF files on-the-fly without requiring external extensions.<br>
 # This class is an extension and improvement of the FPDF class by Olivier Plathey (http://www.fpdf.org).<br>
 # This version contains some changes: [porting to Ruby, support for UTF-8 Unicode, code style and formatting, php documentation (www.phpdoc.org), ISO page formats, minor improvements, image scale factor]<br>
@@ -84,7 +69,8 @@ end
 #
 class TCPDF
   include RFPDF
-  include TCPPDFMath
+  include Core::RFPDF
+  include RFPDF::Math
   
   cattr_accessor :k_cell_height_ratio
   @@k_cell_height_ratio = 1.25

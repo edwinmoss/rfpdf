@@ -4,7 +4,7 @@
 # - Licensed under a MIT-style licence.
 #
 
-module TCPPDFMath
+module RFPDF::Math
   PI2   = ::Math::PI * 2.0
 
   # One degree of arc measured in terms of radians.

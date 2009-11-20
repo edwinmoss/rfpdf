@@ -1,0 +1,28 @@
+8
+
+dir
+1888
+svn+ssh://edmoss@boston/var/svn-repos/gas/branches/rails2/vendor/plugins/rfpdf/lib/rfpdf/template_handlers
+svn+ssh://edmoss@boston/var/svn-repos/gas
+
+
+
+2009-11-20T18:11:03.261979Z
+1888
+edmoss
+
+
+svn:special svn:externals svn:needs-lock
+
+base.rb
+file
+
+
+
+
+2009-11-20T18:01:53.000000Z
+8b2d43afb51c8bf64d398b9d5d886263
+2009-11-20T18:11:03.261979Z
+1888
+edmoss
+
