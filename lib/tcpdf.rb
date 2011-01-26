@@ -824,8 +824,8 @@ class TCPDF
 
   	# calculate elements of transformation matrix
   	tm = []
-  	tm[0] = Math::cos(deg2rad(angle));
-  	tm[1] = Math::sin(deg2rad(angle));
+  	tm[0] = ::Math::cos(deg2rad(angle));
+  	tm[1] = ::Math::sin(deg2rad(angle));
   	tm[2] = -tm[1];
   	tm[3] = tm[0];
   	tm[4] = x + tm[1] * y - tm[0] * x;
